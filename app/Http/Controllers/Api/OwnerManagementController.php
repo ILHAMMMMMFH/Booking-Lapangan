@@ -129,4 +129,36 @@ class OwnerManagementController extends Controller
             abort(403, 'Anda bukan pemilik venue ini.');
         }
     }
+    public function destroyVenue(Request $request, Venue $venue): JsonResponse
+{
+    $this->authorizeOwner($venue, $request->user()->id);
+
+    $hasBookings = $venue->fields()->whereHas('bookings')->exists()
+        || $venue->equipments()->whereHas('bookingEquipments')->exists();
+
+    if ($hasBookings) {
+        return response()->json([
+            'message' => 'Venue tidak bisa dihapus karena masih memiliki riwayat booking.',
+        ], 422);
+    }
+
+    $venue->delete();
+
+    return response()->json(['message' => 'Venue berhasil dihapus.']);
+}
+
+public function destroyField(Request $request, Field $field): JsonResponse
+{
+    $this->authorizeOwner($field->venue, $request->user()->id);
+
+    if ($field->bookings()->exists()) {
+        return response()->json([
+            'message' => 'Lapangan tidak bisa dihapus karena masih memiliki riwayat booking.',
+        ], 422);
+    }
+
+    $field->delete();
+
+    return response()->json(['message' => 'Lapangan berhasil dihapus.']);
+}
 }

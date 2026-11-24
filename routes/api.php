@@ -43,6 +43,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
             Route::post('/venues/{venue}/equipments', [OwnerManagementController::class, 'storeEquipment']);
             Route::put('/equipments/{equipment}', [OwnerManagementController::class, 'updateEquipment']);
+
+            Route::delete('/venues/{venue}', [OwnerManagementController::class, 'destroyVenue']);
+            Route::delete('/fields/{field}', [OwnerManagementController::class, 'destroyField']);
         });
     });
 });
